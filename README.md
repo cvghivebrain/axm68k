@@ -15,9 +15,11 @@ cpu 68000
 Insert the following line whenever you want to switch to Z80 instructions:
 ```
 cpu z80
+obj 0
 ```
 
 And the following line at the end of Z80 instructions:
 ```
 cpu 68000
+objend
 ```
