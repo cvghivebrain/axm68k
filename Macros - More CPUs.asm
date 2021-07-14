@@ -6,9 +6,11 @@ cpu:		macro
 		if strcmp("\1","z80")
 		cpu_mode:	= 1	; Z80
 		opt	an+		; 1234h style numbering
+		opt	ae-		; disable auto evens
 		else
 		cpu_mode:	= 0	; 68000 by default
 		opt	an-		; $1234 style numbering
+		opt	ae+		; enable auto evens
 		endc
 		endm
 
@@ -367,16 +369,25 @@ jp:		macro
 
 
 jr:		macro
-		if strcmp("\1","nz")
-		dc.b $20, \2-*-2
-		elseif strcmp("\1","z")
-		dc.b $28, \2-*-2
-		elseif strcmp("\1","nc")
-		dc.b $30, \2-*-2
-		elseif strcmp("\1","c")
-		dc.b $38, \2-*-2
-		else		; jr n
-		dc.b $18, \1-*-2
+		if narg=1
+		jr_ptr: = \1-*-2
+		else
+		jr_ptr: = \2-*-2
+		endc
+		if (jr_ptr>=-$80)&(jr_ptr<=$7f)	; check if in range
+			if strcmp("\1","nz")
+			dc.b $20, jr_ptr
+			elseif strcmp("\1","z")
+			dc.b $28, jr_ptr
+			elseif strcmp("\1","nc")
+			dc.b $30, jr_ptr
+			elseif strcmp("\1","c")
+			dc.b $38, jr_ptr
+			else		; jr n
+			dc.b $18, jr_ptr
+			endc
+		else
+		fail
 		endc
 		endm
 
@@ -804,7 +815,7 @@ rl:		macro
 		dc.b $cb, $10+zreg
 		elseif instr("\1","(ix") ; rl (ix+n)
 		dc.b $dd, $cb, \1
-			if narg = 2	; rl (ix+n),?
+			if narg=2	; rl (ix+n),?
 			getzreg	\2
 			dc.b $10+zreg
 			else
@@ -812,7 +823,7 @@ rl:		macro
 			endc
 		elseif instr("\1","(iy") ; rl (iy+n)
 		dc.b $fd, $cb, \1
-			if narg = 2	; rl (iy+n),?
+			if narg=2	; rl (iy+n),?
 			getzreg	\2
 			dc.b $10+zreg
 			else
@@ -834,7 +845,7 @@ rlc:		macro
 		dc.b $cb, zreg
 		elseif instr("\1","(ix") ; rlc (ix+n)
 		dc.b $dd, $cb, \1
-			if narg = 2	; rlc (ix+n),?
+			if narg=2	; rlc (ix+n),?
 			getzreg	\2
 			dc.b zreg
 			else
@@ -842,7 +853,7 @@ rlc:		macro
 			endc
 		elseif instr("\1","(iy") ; rlc (iy+n)
 		dc.b $fd, $cb, \1
-			if narg = 2	; rlc (iy+n),?
+			if narg=2	; rlc (iy+n),?
 			getzreg	\2
 			dc.b zreg
 			else
@@ -868,7 +879,7 @@ rr:		macro
 		dc.b $cb, $18+zreg
 		elseif instr("\1","(ix") ; rr (ix+n)
 		dc.b $dd, $cb, \1
-			if narg = 2	; rr (ix+n),?
+			if narg=2	; rr (ix+n),?
 			getzreg	\2
 			dc.b $18+zreg
 			else
@@ -876,7 +887,7 @@ rr:		macro
 			endc
 		elseif instr("\1","(iy") ; rr (iy+n)
 		dc.b $fd, $cb, \1
-			if narg = 2	; rr (iy+n),?
+			if narg=2	; rr (iy+n),?
 			getzreg	\2
 			dc.b $18+zreg
 			else
@@ -898,7 +909,7 @@ rrc:		macro
 		dc.b $cb, $8+zreg
 		elseif instr("\1","(ix") ; rrc (ix+n)
 		dc.b $dd, $cb, \1
-			if narg = 2	; rrc (ix+n),?
+			if narg=2	; rrc (ix+n),?
 			getzreg	\2
 			dc.b $8+zreg
 			else
@@ -906,7 +917,7 @@ rrc:		macro
 			endc
 		elseif instr("\1","(iy") ; rrc (iy+n)
 		dc.b $fd, $cb, \1
-			if narg = 2	; rrc (iy+n),?
+			if narg=2	; rrc (iy+n),?
 			getzreg	\2
 			dc.b $8+zreg
 			else
@@ -992,7 +1003,7 @@ sla:		macro
 		dc.b $cb, $20+zreg
 		elseif instr("\1","(ix")
 		dc.b $dd, $cb, \1
-			if narg = 2	; sla (ix+n),?
+			if narg=2	; sla (ix+n),?
 			getzreg	\2
 			dc.b $20+zreg
 			else		; sla (ix+n)
@@ -1000,7 +1011,7 @@ sla:		macro
 			endc
 		elseif instr("\1","(iy")
 		dc.b $fd, $cb, \1
-			if narg = 2	; sla (iy+n),?
+			if narg=2	; sla (iy+n),?
 			getzreg	\2
 			dc.b $20+zreg
 			else		; sla (iy+n)
@@ -1018,7 +1029,7 @@ sll:		macro
 		dc.b $cb, $30+zreg
 		elseif instr("\1","(ix")
 		dc.b $dd, $cb, \1
-			if narg = 2	; sll (ix+n),?
+			if narg=2	; sll (ix+n),?
 			getzreg	\2
 			dc.b $30+zreg
 			else		; sll (ix+n)
@@ -1026,7 +1037,7 @@ sll:		macro
 			endc
 		elseif instr("\1","(iy")
 		dc.b $fd, $cb, \1
-			if narg = 2	; sll (iy+n),?
+			if narg=2	; sll (iy+n),?
 			getzreg	\2
 			dc.b $30+zreg
 			else		; sll (iy+n)
@@ -1044,7 +1055,7 @@ sra:		macro
 		dc.b $cb, $28+zreg
 		elseif instr("\1","(ix")
 		dc.b $dd, $cb, \1
-			if narg = 2	; sra (ix+n),?
+			if narg=2	; sra (ix+n),?
 			getzreg	\2
 			dc.b $28+zreg
 			else		; sra (ix+n)
@@ -1052,7 +1063,7 @@ sra:		macro
 			endc
 		elseif instr("\1","(iy")
 		dc.b $fd, $cb, \1
-			if narg = 2	; sra (iy+n),?
+			if narg=2	; sra (iy+n),?
 			getzreg	\2
 			dc.b $28+zreg
 			else		; sra (iy+n)
@@ -1070,7 +1081,7 @@ srl:		macro
 		dc.b $cb, $38+zreg
 		elseif instr("\1","(ix")
 		dc.b $dd, $cb, \1
-			if narg = 2	; srl (ix+n),?
+			if narg=2	; srl (ix+n),?
 			getzreg	\2
 			dc.b $38+zreg
 			else		; srl (ix+n)
@@ -1078,7 +1089,7 @@ srl:		macro
 			endc
 		elseif instr("\1","(iy")
 		dc.b $fd, $cb, \1
-			if narg = 2	; srl (iy+n),?
+			if narg=2	; srl (iy+n),?
 			getzreg	\2
 			dc.b $38+zreg
 			else		; srl (iy+n)
