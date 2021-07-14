@@ -10,7 +10,6 @@ cpu:		macro
 		else
 		cpu_mode:	= 0	; 68000 by default
 		opt	an-		; $1234 style numbering
-		opt	ae+		; enable auto evens
 		endc
 		endm
 
