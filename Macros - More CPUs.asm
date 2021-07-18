@@ -127,24 +127,28 @@ bit:		macro
 
 call:		macro
 		if strcmp("\1","nz")
-		dc.b $c4, (\2)&$ff, (\2)>>8
+		dc.b $c4
 		elseif strcmp("\1","z")
-		dc.b $cc, (\2)&$ff, (\2)>>8
+		dc.b $cc
 		elseif strcmp("\1","nc")
-		dc.b $d4, (\2)&$ff, (\2)>>8
+		dc.b $d4
 		elseif strcmp("\1","c")
-		dc.b $dc, (\2)&$ff, (\2)>>8
+		dc.b $dc
 		elseif strcmp("\1","po")
-		dc.b $e4, (\2)&$ff, (\2)>>8
+		dc.b $e4
 		elseif strcmp("\1","pe")
-		dc.b $ec, (\2)&$ff, (\2)>>8
+		dc.b $ec
 		elseif strcmp("\1","p")
-		dc.b $f4, (\2)&$ff, (\2)>>8
+		dc.b $f4
 		elseif strcmp("\1","m")
-		dc.b $fc, (\2)&$ff, (\2)>>8
+		dc.b $fc
 		else		; call n
-		dc.b $cd, (\1)&$ff, (\1)>>8
+		dc.b $cd
 		endc
+		if narg=2
+		shift
+		endc
+		dc.b (\1)&$ff, (\1)>>8
 		endm
 
 ccf:		macros
@@ -343,30 +347,36 @@ inir:		macros
 
 
 jp:		macro
-		if strcmp("\1","nz")
-		dc.b $c2, \2&$ff, \2>>8
-		elseif strcmp("\1","z")
-		dc.b $ca, \2&$ff, \2>>8
-		elseif strcmp("\1","nc")
-		dc.b $d2, \2&$ff, \2>>8
-		elseif strcmp("\1","c")
-		dc.b $da, \2&$ff, \2>>8
-		elseif strcmp("\1","po")
-		dc.b $e2, \2&$ff, \2>>8
-		elseif strcmp("\1","pe")
-		dc.b $ea, \2&$ff, \2>>8
-		elseif strcmp("\1","p")
-		dc.b $f2, \2&$ff, \2>>8
-		elseif strcmp("\1","m")
-		dc.b $fa, \2&$ff, \2>>8
-		elseif strcmp("\1","(hl)")
+		if strcmp("\1","(hl)")
 		dc.b $e9
 		elseif strcmp("\1","(ix)")
 		dc.w $dde9
 		elseif strcmp("\1","(iy)")
 		dc.w $fde9
-		else		; jp n
-		dc.b $c3, (\1)&$ff, (\1)>>8
+		else
+			if strcmp("\1","nz")
+			dc.b $c2
+			elseif strcmp("\1","z")
+			dc.b $ca
+			elseif strcmp("\1","nc")
+			dc.b $d2
+			elseif strcmp("\1","c")
+			dc.b $da
+			elseif strcmp("\1","po")
+			dc.b $e2
+			elseif strcmp("\1","pe")
+			dc.b $ea
+			elseif strcmp("\1","p")
+			dc.b $f2
+			elseif strcmp("\1","m")
+			dc.b $fa
+			else		; jp n
+			dc.b $c3
+			endc
+			if narg=2
+			shift
+			endc
+			dc.b (\1)&$ff, (\1)>>8
 		endc
 		endm
 
@@ -641,24 +651,25 @@ ld:		macro
 			dc3 $dd3600+\1
 			dc.b \2
 			endc
-		else			; ld n,?
+		else			; ld (n),?
 			if strcmp("\2","a")
-			dc.b $32, \1&$ff, \1>>8
+			dc.b $32
 			elseif strcmp("\2","bc")
-			dc.b $ed, $43, \1&$ff, \1>>8
+			dc.w $ed43
 			elseif strcmp("\2","de")
-			dc.b $ed, $53, \1&$ff, \1>>8
+			dc.w $ed53
 			elseif strcmp("\2","hl")
-			dc.b $ed, $63, \1&$ff, \1>>8
+			dc.w $ed63
 			elseif strcmp("\2","sp")
-			dc.b $ed, $73, \1&$ff, \1>>8
+			dc.w $ed73
 			elseif strcmp("\2","ix")
-			dc.b $dd, $22, \1&$ff, \1>>8
+			dc.w $dd22
 			elseif strcmp("\2","iy")
-			dc.b $fd, $22, \1&$ff, \1>>8
+			dc.w $fd22
 			else
 			fail
 			endc
+			dc.b \1&$ff, \1>>8
 		endc
 		endm
 
