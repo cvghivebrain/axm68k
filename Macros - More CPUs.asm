@@ -1434,11 +1434,3 @@ subq:		macros
 
 subx:		macros
 		sxbx.\0	\_
-
-exg:		macro
-		if (instr("\1","a")+instr("\2","d"))=2
-		exy	\2,\1
-		else
-		exy	\1,\2
-		endc
-		endm
