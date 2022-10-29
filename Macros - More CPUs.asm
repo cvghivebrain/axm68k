@@ -232,7 +232,7 @@ daa:		macros
 
 dec:		macro
 		local num
-		if instr("a b c d e h l ","\1\ ")
+		if instr("a b c d e h l (hl) ","\1\ ")
 		getzreg	\1
 		dc.b $5+(zreg*8)
 		elseif strcmp("\1","ixh")
@@ -339,7 +339,7 @@ in:		macro
 
 inc:		macro
 		local num
-		if instr("a b c d e h l ","\1\ ")
+		if instr("a b c d e h l (hl) ","\1\ ")
 		getzreg	\1
 		dc.b $4+(zreg*8)
 		elseif strcmp("\1","ixh")
@@ -1072,7 +1072,9 @@ scf:		macros
 set:		macro
 		local num, num2
 		num: equ \1
-		if instr("a b c d e h l (hl) ","\2\ ")
+		if narg=1
+		inform 3,"Use = instead of SET for redefinable symbols."
+		elseif instr("a b c d e h l (hl) ","\2\ ")
 		getzreg	\2
 		dc.b $cb, $c0+(num*8)+zreg
 		elseif instr("\2","(i")				; set n,(ix+n)
