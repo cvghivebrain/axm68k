@@ -1020,33 +1020,17 @@ rrd:		macros
 rst:		macro
 		local num
 		num: equ \1
+		if num>7
 		dc.b $c7+(num&$38)
+		else
+		dc.b $c7+(num<<3)
+		endc
 		endm
 
 
 sbc:		macro
 		local num
-		if strcmp("\1","a")
-			if instr("a b c d e h l (hl) ","\2\ ")
-			getzreg	\2
-			dc.b $98+zreg
-			elseif strcmp("\2","ixh")|strcmp("\2","ixu")
-			dc.w $dd9c
-			elseif strcmp("\2","ixl")
-			dc.w $dd9d
-			elseif strcmp("\2","iyh")|strcmp("\2","iyu")
-			dc.w $fd9c
-			elseif strcmp("\2","iyl")
-			dc.w $fd9d
-			elseif instr("\2","(i")			; sbc a,(ix+n)
-				num: equ \2
-				getindex \2
-				dc.b ireg, $9e, num
-			else					; sbc a,n
-			num: equ \2
-			dc.b $de, num
-			endc
-		elseif strcmp("\1","hl")
+		if strcmp("\1","hl")
 			if strcmp("\2","bc")
 			dc.w $ed42
 			elseif strcmp("\2","de")
@@ -1057,6 +1041,34 @@ sbc:		macro
 			dc.w $ed72
 			else
 			fail
+			endc
+			mexit
+		endc
+
+		; "sbc a, x" or "sbc x"
+		if narg=2 & strcmp("\1","a")
+			shift					; ignore a
+		endc
+		
+		if (narg=1) | (narg=2)
+			if instr("a b c d e h l (hl) ","\1\ ")
+			getzreg	\1
+			dc.b $98+zreg
+			elseif strcmp("\1","ixh")|strcmp("\1","ixu")
+			dc.w $dd9c
+			elseif strcmp("\1","ixl")
+			dc.w $dd9d
+			elseif strcmp("\1","iyh")|strcmp("\1","iyu")
+			dc.w $fd9c
+			elseif strcmp("\1","iyl")
+			dc.w $fd9d
+			elseif instr("\1","(i")			; sbc a,(ix+n)
+				num: equ \1
+				getindex \1
+				dc.b ireg, $9e, num
+			else					; sbc a,n
+			num: equ \1
+			dc.b $de, num
 			endc
 		else
 		fail
@@ -1185,6 +1197,9 @@ srl:		macro
 
 xor:		macro
 		local num
+		if narg=2 & strcmp("\1","a")
+		shift						; ignore a if using alternate syntax
+		endc
 		if instr("a b c d e h l (hl) ","\1\ ")
 		getzreg	\1
 		dc.b $a8+zreg
@@ -1310,6 +1325,9 @@ add:		macro
 and:		macro
 		local num
 		if cpu_mode=1					; Z80
+			if narg=2 & strcmp("\1","a")
+			shift					; ignore a if using alternate syntax
+			endc
 			if instr("a b c d e h l (hl) ","\1\ ")
 			getzreg	\1
 			dc.b $a0+zreg
@@ -1356,6 +1374,9 @@ nop:		macro
 or:		macro
 		local num
 		if cpu_mode=1					; Z80
+			if narg=2 & strcmp("\1","a")
+			shift					; ignore a if using alternate syntax
+			endc
 			if instr("a b c d e h l (hl) ","\1\ ")
 			getzreg	\1
 			dc.b $b0+zreg
@@ -1384,6 +1405,9 @@ or:		macro
 sub:		macro
 		local num
 		if cpu_mode=1					; Z80
+			if narg=2 & strcmp("\1","a")
+			shift					; ignore a if using alternate syntax
+			endc
 			if instr("a b c d e h l (hl) ","\1\ ")
 			getzreg	\1
 			dc.b $90+zreg
@@ -1396,7 +1420,7 @@ sub:		macro
 			elseif strcmp("\1","iyl")
 			dc.w $fd95
 			elseif instr("\1","(i")			; sub (ix+n)
-				um: equ \1
+				num: equ \1
 				getindex \1
 				dc.b ireg, $96, num
 			else					; sub n
