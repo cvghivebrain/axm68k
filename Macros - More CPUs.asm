@@ -192,7 +192,7 @@ call:		macro
 			mexit
 		endc
 
-		dc.b num&$FF, num>>8
+		dc.b num&$FF, (num>>8)&$FF
 		endm
 
 ccf:		macros
@@ -467,7 +467,7 @@ jp:		macro
 			if narg=2
 			shift
 			endc
-			dc.b num&$FF, num>>8
+			dc.b num&$FF, (num>>8)&$FF
 		endc
 		endm
 
@@ -1393,7 +1393,7 @@ dw:		macro
 		rept narg
 			local num\#c
 			num\#c\: equ \1
-			dc.b (num\#c\)&$FF, (num\#c\)>>8
+			dc.b (num\#c\)&$FF, ((num\#c\)>>8)&$FF
 			shift
 			c: = c+1
 		endr
