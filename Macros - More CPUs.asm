@@ -192,7 +192,7 @@ call:		macro
 			mexit
 		endc
 
-		dc.b num&$FF, num>>8
+		dc.b num&$FF, (num>>8)&$FF
 		endm
 
 ccf:		macros
@@ -467,7 +467,7 @@ jp:		macro
 			if narg=2
 			shift
 			endc
-			dc.b num&$FF, num>>8
+			dc.b num&$FF, (num>>8)&$FF
 		endc
 		endm
 
@@ -546,7 +546,7 @@ ld:		macro
 				tmp_fc:	substr	1,1,"\2"
 				tmp_lc:	substr	tmp_len,tmp_len,"\2"
 				if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld a,(n)
-				dc.b $3a, num&$ff, num>>8
+				dc.b $3a, num&$ff, (num>>8)&$ff
 				else				; ld a,n
 				dc.b $3e, num
 				endc
@@ -769,9 +769,9 @@ ld:		macro
 			tmp_fc:	substr	1,1,"\2"
 			tmp_lc:	substr	tmp_len,tmp_len,"\2"
 			if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld bc,(n)
-			dc.b $ed, $4b, num&$ff, num>>8
+			dc.b $ed, $4b, num&$ff, (num>>8)&$ff
 			else					; ld bc,n
-			dc.b $1, num&$ff, num>>8
+			dc.b $1, num&$ff, (num>>8)&$ff
 			endc
 		elseif strcmp("\1","de")
 			if instr("a b c d e h l (hl) ixh ixu ixl iyh iyu iyl i r ","\2\ ")	; filter out illegal sources
@@ -783,9 +783,9 @@ ld:		macro
 			tmp_fc:	substr	1,1,"\2"
 			tmp_lc:	substr	tmp_len,tmp_len,"\2"
 			if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld de,(n)
-			dc.b $ed, $5b, num&$ff, num>>8
+			dc.b $ed, $5b, num&$ff, (num>>8)&$ff
 			else					; ld de,n
-			dc.b $11, num&$ff, num>>8
+			dc.b $11, num&$ff, (num>>8)&$ff
 			endc
 		elseif strcmp("\1","hl")
 			if instr("a b c d e h l (hl) ixh ixu ixl iyh iyu iyl i r ","\2\ ")	; filter out illegal sources
@@ -797,9 +797,9 @@ ld:		macro
 			tmp_fc:	substr	1,1,"\2"
 			tmp_lc:	substr	tmp_len,tmp_len,"\2"
 			if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld hl,(n)
-			dc.b $2a, num&$ff, num>>8
+			dc.b $2a, num&$ff, (num>>8)&$ff
 			else					; ld hl,n
-			dc.b $21, num&$ff, num>>8
+			dc.b $21, num&$ff, (num>>8)&$ff
 			endc
 		elseif strcmp("\1","sp")
 			if instr("a b c d e h l (hl) ixh ixu ixl iyh iyu iyl i r ","\2\ ")	; filter out illegal sources
@@ -818,9 +818,9 @@ ld:		macro
 				tmp_fc:	substr	1,1,"\2"
 				tmp_lc:	substr	tmp_len,tmp_len,"\2"
 				if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld sp,(n)
-				dc.b $ed, $7b, num&$ff, num>>8
+				dc.b $ed, $7b, num&$ff, (num>>8)&$ff
 				else				; ld sp,n
-				dc.b $31, num&$ff, num>>8
+				dc.b $31, num&$ff, (num>>8)&$ff
 				endc
 			endc
 		elseif strcmp("\1","ix")
@@ -833,9 +833,9 @@ ld:		macro
 			tmp_fc:	substr	1,1,"\2"
 			tmp_lc:	substr	tmp_len,tmp_len,"\2"
 			if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld ix,(n)
-			dc.b $dd, $2a, num&$ff, num>>8
+			dc.b $dd, $2a, num&$ff, (num>>8)&$ff
 			else					; ld ix,n
-			dc.b $dd, $21, num&$ff, num>>8
+			dc.b $dd, $21, num&$ff, (num>>8)&$ff
 			endc
 		elseif strcmp("\1","iy")
 			if instr("a b c d e h l (hl) ixh ixu ixl iyh iyu iyl i r ","\2\ ")	; filter out illegal sources
@@ -847,9 +847,9 @@ ld:		macro
 			tmp_fc:	substr	1,1,"\2"
 			tmp_lc:	substr	tmp_len,tmp_len,"\2"
 			if strcmp("\tmp_fc","(") & strcmp("\tmp_lc",")") ; ld iy,(n)
-			dc.b $fd, $2a, num&$ff, num>>8
+			dc.b $fd, $2a, num&$ff, (num>>8)&$ff
 			else					; ld iy,n
-			dc.b $fd, $21, num&$ff, num>>8
+			dc.b $fd, $21, num&$ff, (num>>8)&$ff
 			endc
 		elseif strcmp("\1","(bc)")
 			if strcmp("\2","a")			; ld (bc),a
@@ -905,7 +905,7 @@ ld:		macro
 			z80_error	"ld","Illegal addressing mode","\_"
 			mexit
 			endc
-			dc.b num&$FF, num>>8
+			dc.b num&$FF, (num>>8)&$ff
 		endc
 		endm
 
@@ -1393,7 +1393,7 @@ dw:		macro
 		rept narg
 			local num\#c
 			num\#c\: equ \1
-			dc.b (num\#c\)&$FF, (num\#c\)>>8
+			dc.b (num\#c\)&$FF, ((num\#c\)>>8)&$FF
 			shift
 			c: = c+1
 		endr
